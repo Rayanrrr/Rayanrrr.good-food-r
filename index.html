@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>තෙම්පරාදුව | Themparaduwa - Authentic Sri Lankan Homemade Food</title>
+<meta name="description" content="තෙම්පරාදුව - Authentic Sri Lankan homemade food delivery. Order rice, kottu, biriyani, and traditional side dishes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+    --primary-red: #C62828; --primary-red-light: #E53935; --primary-red-dark: #8E0000;
+    --gold: #FFD700; --gold-light: #FFE55C; --gold-dark: #B8860B;
+    --black: #0A0A0A; --black-light: #1A1A1A; --black-lighter: #2D2D2D;
+    --white: #FFFFFF; --cream: #FFF8E7; --gray: #6B7280; --gray-light: #F3F4F6;
+    --shadow: 0 10px 40px rgba(0,0,0,0.3); --shadow-gold: 0 0 30px rgba(255,215,0,0.3);
+    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+    font-family: 'Noto Sans Sinhala', 'Poppins', sans-serif;
+    background: var(--black); color: var(--white); overflow-x: hidden; line-height: 1.6;
+}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+.loading-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--black); z-index: 99999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+.loading-screen.hidden { opacity: 0; visibility: hidden; }
+.loading-logo { font-size: 3rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(255,215,0,0.5); animation: pulse 1.5s ease-in-out infinite; margin-bottom: 20px; }
+.loading-bar { width: 200px; height: 4px; background: var(--black-lighter); border-radius: 2px; overflow: hidden; }
+.loading-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; animation: loadProgress 2s ease-in-out forwards; }
+@keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+.navbar {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    padding: 1rem 2rem; transition: var(--transition); background: transparent;
+}
+.navbar.scrolled { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); box-shadow: 0 2px 20px rgba(0,0,0,0.5); padding: 0.8rem 2rem; }
+.nav-container { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { font-size: 1.8rem; font-weight: 900; color: var(--gold); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.nav-logo i { font-size: 1.5rem; }
+.nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--white); text-decoration: none; font-weight: 500; font-size: 0.95rem; position: relative; transition: var(--transition); padding: 0.5rem 0; }
+.nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--gold); transition: var(--transition); }
+.nav-links a:hover { color: var(--gold); }
+.nav-links a:hover::after { width: 100%; }
+.nav-actions { display: flex; align-items: center; gap: 1rem; }
+.nav-btn { background: var(--primary-red); color: var(--white); border: none; padding: 0.6rem 1.2rem; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem; }
+.nav-btn:hover { background: var(--primary-red-light); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(198,40,40,0.4); }
+.cart-icon { position: relative; background: transparent; border: 2px solid var(--gold); color: var(--gold); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: var(--transition); }
+.cart-icon:hover { background: var(--gold); color: var(--black); }
+.cart-count { position: absolute; top: -5px; right: -5px; background: var(--primary-red); color: var(--white); font-size: 0.7rem; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.mobile-menu-btn { display: none; background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+
+.hero { min-height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(10,10,10,0.85) 0%, rgba(198,40,40,0.3) 50%, rgba(10,10,10,0.9) 100%), url('https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1920&q=80') center/cover; z-index: -2; }
+.hero-particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+.particle { position: absolute; width: 4px; height: 4px; background: var(--gold); border-radius: 50%; opacity: 0.3; animation: float 15s infinite; }
+@keyframes float { 0%,100% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.3; } 90% { opacity: 0.3; } 100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; } }
+.hero-content { text-align: center; z-index: 1; padding: 2rem; max-width: 900px; animation: fadeInUp 1s ease-out; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+.hero-badge { display: inline-block; background: rgba(255,215,0,0.15); border: 1px solid var(--gold); color: var(--gold); padding: 0.5rem 1.5rem; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
+.hero-title { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; color: var(--gold); text-shadow: 0 0 40px rgba(255,215,0,0.3); margin-bottom: 0.5rem; line-height: 1.1; }
+.hero-subtitle { font-size: clamp(1.2rem, 3vw, 1.8rem); color: var(--white); font-weight: 300; margin-bottom: 1rem; opacity: 0.9; }
+.hero-slogan { font-size: 1.1rem; color: var(--gold-light); font-weight: 500; margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+.hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn-primary { background: var(--primary-red); color: var(--white); padding: 1rem 2.5rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; border: 2px solid var(--primary-red); cursor: pointer; }
+.btn-primary:hover { background: transparent; color: var(--primary-red-light); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(198,40,40,0.4); }
+.btn-secondary { background: transparent; color: var(--gold); padding: 1rem 2.5rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; border: 2px solid var(--gold); cursor: pointer; }
+.btn-secondary:hover { background: var(--gold); color: var(--black); transform: translateY(-3px); box-shadow: var(--shadow-gold); }
+.hero-stats { display: flex; justify-content: center; gap: 3rem; margin-top: 4rem; flex-wrap: wrap; }
+.stat-item { text-align: center; }
+.stat-number { font-size: 2.5rem; font-weight: 900; color: var(--gold); }
+.stat-label { font-size: 0.9rem; color: var(--gray); font-weight: 500; }
+
+section { padding: 5rem 2rem; position: relative; }
+.section-header { text-align: center; margin-bottom: 3rem; }
+.section-label { display: inline-block; color: var(--primary-red-light); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0.5rem; }
+.section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; color: var(--gold); margin-bottom: 1rem; }
+.section-desc { color: var(--gray); max-width: 600px; margin: 0 auto; font-size: 1rem; }
+
+.search-filter-bar { max-width: 800px; margin: 0 auto 3rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; justify-content: center; }
+.search-box { flex: 1; min-width: 250px; position: relative; }
+.search-box input { width: 100%; padding: 1rem 1rem 1rem 3rem; border: 2px solid var(--black-lighter); border-radius: 50px; background: var(--black-light); color: var(--white); font-size: 1rem; transition: var(--transition); font-family: inherit; }
+.search-box input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.1); }
+.search-box i { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--gray); }
+.category-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+.filter-btn { padding: 0.7rem 1.2rem; border: 1px solid var(--black-lighter); background: var(--black-light); color: var(--gray); border-radius: 50px; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: var(--transition); font-family: inherit; }
+.filter-btn:hover, .filter-btn.active { background: var(--primary-red); color: var(--white); border-color: var(--primary-red); }
+
+.food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; max-width: 1400px; margin: 0 auto; }
+.food-card { background: var(--black-light); border-radius: 20px; overflow: hidden; transition: var(--transition); border: 1px solid rgba(255,215,0,0.1); position: relative; }
+.food-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5), var(--shadow-gold); border-color: rgba(255,215,0,0.3); }
+.food-card-image { position: relative; height: 220px; overflow: hidden; }
+.food-card-image img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
+.food-card:hover .food-card-image img { transform: scale(1.1); }
+.food-badge { position: absolute; top: 15px; left: 15px; background: var(--primary-red); color: var(--white); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+.food-badge.out-of-stock { background: var(--gray); }
+.food-badge.featured { background: var(--gold); color: var(--black); }
+.food-card-content { padding: 1.5rem; }
+.food-card-category { color: var(--primary-red-light); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+.food-card-title { font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+.food-card-desc { color: var(--gray); font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5; }
+.food-card-footer { display: flex; align-items: center; justify-content: space-between; }
+.food-price { font-size: 1.5rem; font-weight: 800; color: var(--gold); }
+.food-price span { font-size: 0.9rem; color: var(--gray); font-weight: 400; }
+.add-to-cart-btn { background: var(--primary-red); color: var(--white); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+.add-to-cart-btn:hover { background: var(--primary-red-light); transform: scale(1.1); }
+.add-to-cart-btn:disabled { background: var(--gray); cursor: not-allowed; transform: none; }
+
+.about-section { background: var(--black-light); }
+.about-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.about-image { position: relative; }
+.about-image img { width: 100%; border-radius: 20px; box-shadow: var(--shadow); }
+.about-image::before { content: ''; position: absolute; top: -20px; left: -20px; width: 100%; height: 100%; border: 3px solid var(--gold); border-radius: 20px; z-index: -1; }
+.about-content h2 { font-size: 2.5rem; color: var(--gold); margin-bottom: 1rem; }
+.about-content p { color: var(--gray); margin-bottom: 1rem; font-size: 1rem; }
+.about-features { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+.about-feature { display: flex; align-items: center; gap: 0.8rem; }
+.about-feature i { color: var(--gold); font-size: 1.2rem; }
+.about-feature span { color: var(--white); font-weight: 500; font-size: 0.95rem; }
+
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+.feature-card { background: var(--black-light); padding: 2.5rem 2rem; border-radius: 20px; text-align: center; transition: var(--transition); border: 1px solid rgba(255,215,0,0.1); position: relative; overflow: hidden; }
+.feature-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gold); transform: scaleX(0); transition: var(--transition); }
+.feature-card:hover::before { transform: scaleX(1); }
+.feature-card:hover { transform: translateY(-5px); border-color: rgba(255,215,0,0.3); }
+.feature-icon { width: 70px; height: 70px; background: rgba(255,215,0,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem; color: var(--gold); }
+.feature-card h3 { font-size: 1.2rem; color: var(--white); margin-bottom: 0.8rem; }
+.feature-card p { color: var(--gray); font-size: 0.9rem; }
+
+.reviews-section { background: var(--black-light); }
+.reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+.review-card { background: var(--black); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,215,0,0.1); transition: var(--transition); }
+.review-card:hover { border-color: rgba(255,215,0,0.3); }
+.review-stars { color: var(--gold); margin-bottom: 1rem; font-size: 0.9rem; }
+.review-text { color: var(--gray); font-style: italic; margin-bottom: 1.5rem; line-height: 1.7; }
+.reviewer { display: flex; align-items: center; gap: 1rem; }
+.reviewer-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--primary-red); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--white); }
+.reviewer-info h4 { color: var(--white); font-size: 1rem; }
+.reviewer-info span { color: var(--gray); font-size: 0.8rem; }
+
+.contact-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+.contact-info h3 { font-size: 1.8rem; color: var(--gold); margin-bottom: 1.5rem; }
+.contact-item { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--black-light); border-radius: 15px; transition: var(--transition); }
+.contact-item:hover { background: var(--black-lighter); transform: translateX(5px); }
+.contact-item i { width: 50px; height: 50px; background: rgba(255,215,0,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 1.2rem; }
+.contact-item div h4 { color: var(--white); font-size: 1rem; margin-bottom: 0.2rem; }
+.contact-item div p, .contact-item div a { color: var(--gray); font-size: 0.9rem; text-decoration: none; transition: var(--transition); }
+.contact-item div a:hover { color: var(--gold); }
+.map-placeholder { background: var(--black-light); border-radius: 20px; height: 100%; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed var(--black-lighter); position: relative; overflow: hidden; }
+.map-placeholder i { font-size: 4rem; color: var(--gold); margin-bottom: 1rem; }
+.map-placeholder p { color: var(--gray); }
+
+.footer { background: var(--black-light); padding: 4rem 2rem 1rem; border-top: 1px solid rgba(255,215,0,0.1); }
+.footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+.footer-brand h3 { font-size: 1.8rem; color: var(--gold); margin-bottom: 1rem; }
+.footer-brand p { color: var(--gray); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+.footer-social { display: flex; gap: 1rem; }
+.footer-social a { width: 40px; height: 40px; background: var(--black-lighter); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); text-decoration: none; transition: var(--transition); }
+.footer-social a:hover { background: var(--gold); color: var(--black); transform: translateY(-3px); }
+.footer-links h4 { color: var(--gold); font-size: 1.1rem; margin-bottom: 1.5rem; }
+.footer-links ul { list-style: none; }
+.footer-links li { margin-bottom: 0.8rem; }
+.footer-links a { color: var(--gray); text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
+.footer-links a:hover { color: var(--gold); padding-left: 5px; }
+.footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--black-lighter); color: var(--gray); font-size: 0.85rem; }
+.footer-bottom a { color: var(--gold); text-decoration: none; }
+
+.cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; opacity: 0; visibility: hidden; transition: var(--transition); }
+.cart-overlay.active { opacity: 1; visibility: visible; }
+.cart-sidebar { position: fixed; top: 0; right: -450px; width: 100%; max-width: 450px; height: 100%; background: var(--black-light); z-index: 2001; transition: var(--transition); display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.5); }
+.cart-sidebar.active { right: 0; }
+.cart-header { padding: 1.5rem; border-bottom: 1px solid var(--black-lighter); display: flex; align-items: center; justify-content: space-between; }
+.cart-header h3 { color: var(--gold); font-size: 1.3rem; }
+.cart-close { background: none; border: none; color: var(--gray); font-size: 1.5rem; cursor: pointer; transition: var(--transition); }
+.cart-close:hover { color: var(--primary-red); }
+.cart-items { flex: 1; overflow-y: auto; padding: 1rem; }
+.cart-empty { text-align: center; padding: 3rem 1rem; color: var(--gray); }
+.cart-empty i { font-size: 3rem; margin-bottom: 1rem; color: var(--black-lighter); }
+.cart-item { display: flex; gap: 1rem; padding: 1rem; background: var(--black); border-radius: 15px; margin-bottom: 1rem; align-items: center; }
+.cart-item img { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; }
+.cart-item-info { flex: 1; }
+.cart-item-info h4 { color: var(--white); font-size: 0.95rem; margin-bottom: 0.3rem; }
+.cart-item-info p { color: var(--gold); font-weight: 700; font-size: 0.9rem; }
+.cart-item-actions { display: flex; align-items: center; gap: 0.5rem; }
+.qty-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--black-lighter); background: var(--black-light); color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+.qty-btn:hover { background: var(--primary-red); border-color: var(--primary-red); }
+.cart-item-qty { font-weight: 700; min-width: 25px; text-align: center; }
+.cart-item-remove { background: none; border: none; color: var(--gray); cursor: pointer; padding: 0.3rem; transition: var(--transition); }
+.cart-item-remove:hover { color: var(--primary-red); }
+.cart-footer { padding: 1.5rem; border-top: 1px solid var(--black-lighter); }
+.cart-total { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1.2rem; }
+.cart-total span:first-child { color: var(--gray); }
+.cart-total span:last-child { color: var(--gold); font-weight: 800; }
+.checkout-btn { width: 100%; padding: 1rem; background: var(--primary-red); color: var(--white); border: none; border-radius: 15px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); font-family: inherit; margin-bottom: 0.5rem; }
+.checkout-btn:hover { background: var(--primary-red-light); }
+.whatsapp-checkout { width: 100%; padding: 1rem; background: #25D366; color: var(--white); border: none; border-radius: 15px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.whatsapp-checkout:hover { background: #128C7E; }
+
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); padding: 1rem; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal { background: var(--black-light); border-radius: 25px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.9); transition: var(--transition); border: 1px solid rgba(255,215,0,0.2); }
+.modal-overlay.active .modal { transform: scale(1); }
+.modal-header { padding: 1.5rem; border-bottom: 1px solid var(--black-lighter); display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { color: var(--gold); font-size: 1.3rem; }
+.modal-body { padding: 1.5rem; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; color: var(--gray); margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.9rem 1rem; border: 2px solid var(--black-lighter); border-radius: 12px; background: var(--black); color: var(--white); font-size: 1rem; transition: var(--transition); font-family: inherit; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--gold); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.order-summary { background: var(--black); border-radius: 15px; padding: 1rem; margin-bottom: 1.5rem; }
+.order-summary h4 { color: var(--gold); margin-bottom: 1rem; font-size: 1rem; }
+.summary-item { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.summary-item span:first-child { color: var(--gray); }
+.summary-item span:last-child { color: var(--white); }
+.summary-total { border-top: 1px solid var(--black-lighter); padding-top: 0.5rem; margin-top: 0.5rem; font-weight: 700; }
+.summary-total span:last-child { color: var(--gold); font-size: 1.1rem; }
+.submit-order-btn { width: 100%; padding: 1rem; background: var(--gold); color: var(--black); border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: var(--transition); font-family: inherit; }
+.submit-order-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+.admin-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); }
+.admin-overlay.active { opacity: 1; visibility: visible; }
+.admin-panel { background: var(--black-light); border-radius: 25px; width: 100%; max-width: 900px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; transform: scale(0.9); transition: var(--transition); border: 1px solid rgba(255,215,0,0.2); }
+.admin-overlay.active .admin-panel { transform: scale(1); }
+.admin-header { padding: 1.5rem 2rem; background: var(--black); border-bottom: 1px solid var(--black-lighter); display: flex; align-items: center; justify-content: space-between; }
+.admin-header h2 { color: var(--gold); font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; }
+.admin-close { background: none; border: none; color: var(--gray); font-size: 1.5rem; cursor: pointer; transition: var(--transition); }
+.admin-close:hover { color: var(--primary-red); }
+.admin-body { flex: 1; overflow-y: auto; padding: 2rem; }
+.admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--black-lighter); padding-bottom: 1rem; }
+.admin-tab { padding: 0.7rem 1.2rem; background: none; border: none; color: var(--gray); cursor: pointer; font-weight: 600; font-size: 0.9rem; border-radius: 10px; transition: var(--transition); font-family: inherit; }
+.admin-tab:hover { color: var(--white); background: var(--black-lighter); }
+.admin-tab.active { color: var(--gold); background: rgba(255,215,0,0.1); }
+.admin-section { display: none; }
+.admin-section.active { display: block; }
+.admin-food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+.admin-food-item { background: var(--black); border-radius: 15px; overflow: hidden; border: 1px solid var(--black-lighter); transition: var(--transition); }
+.admin-food-item:hover { border-color: var(--gold); }
+.admin-food-item img { width: 100%; height: 120px; object-fit: cover; }
+.admin-food-info { padding: 1rem; }
+.admin-food-info h4 { color: var(--white); font-size: 0.9rem; margin-bottom: 0.3rem; }
+.admin-food-info p { color: var(--gold); font-weight: 700; font-size: 0.9rem; }
+.admin-food-actions { display: flex; gap: 0.5rem; padding: 0 1rem 1rem; }
+.admin-btn-sm { flex: 1; padding: 0.5rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: var(--transition); font-family: inherit; }
+.admin-btn-edit { background: var(--gold); color: var(--black); }
+.admin-btn-edit:hover { background: var(--gold-light); }
+.admin-btn-delete { background: var(--primary-red); color: var(--white); }
+.admin-btn-delete:hover { background: var(--primary-red-light); }
+.add-food-btn { width: 100%; padding: 1rem; background: var(--primary-red); color: var(--white); border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-bottom: 2rem; transition: var(--transition); font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.add-food-btn:hover { background: var(--primary-red-light); }
+.admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.admin-stat-card { background: var(--black); padding: 1.5rem; border-radius: 15px; text-align: center; border: 1px solid var(--black-lighter); }
+.admin-stat-card h3 { font-size: 2rem; color: var(--gold); margin-bottom: 0.3rem; }
+.admin-stat-card p { color: var(--gray); font-size: 0.85rem; }
+
+.login-form { max-width: 400px; margin: 0 auto; text-align: center; }
+.login-form h3 { color: var(--gold); margin-bottom: 0.5rem; }
+.login-form p { color: var(--gray); margin-bottom: 2rem; }
+.login-form .form-group { text-align: left; }
+.login-btn { width: 100%; padding: 1rem; background: var(--gold); color: var(--black); border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: var(--transition); font-family: inherit; margin-top: 1rem; }
+.login-btn:hover { background: var(--gold-light); }
+
+.floating-buttons { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; flex-direction: column; gap: 1rem; }
+.floating-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 1.5rem; cursor: pointer; transition: var(--transition); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.3); text-decoration: none; }
+.floating-btn:hover { transform: scale(1.1) translateY(-3px); }
+.float-whatsapp { background: #25D366; }
+.float-whatsapp:hover { box-shadow: 0 5px 25px rgba(37,211,102,0.5); }
+.float-admin { background: var(--gold); color: var(--black); }
+.float-admin:hover { box-shadow: var(--shadow-gold); }
+
+.animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+.offer-banner { background: var(--primary-red); color: var(--white); text-align: center; padding: 0.8rem; font-weight: 600; font-size: 0.9rem; position: relative; overflow: hidden; }
+.offer-banner::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: rgba(255,255,255,0.1); animation: shimmer 3s infinite; }
+@keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+
+.mobile-menu { position: fixed; top: 0; right: -100%; width: 80%; max-width: 350px; height: 100%; background: var(--black-light); z-index: 1500; transition: var(--transition); padding: 2rem; display: flex; flex-direction: column; }
+.mobile-menu.active { right: 0; }
+.mobile-menu-close { align-self: flex-end; background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; margin-bottom: 2rem; }
+.mobile-menu-links { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; }
+.mobile-menu-links a { color: var(--white); text-decoration: none; font-size: 1.2rem; font-weight: 600; transition: var(--transition); }
+.mobile-menu-links a:hover { color: var(--gold); }
+.mobile-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1400; opacity: 0; visibility: hidden; transition: var(--transition); }
+.mobile-menu-overlay.active { opacity: 1; visibility: visible; }
+
+.toast-container { position: fixed; top: 100px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 0.5rem; }
+.toast { background: var(--black-light); color: var(--white); padding: 1rem 1.5rem; border-radius: 12px; border-left: 4px solid var(--gold); box-shadow: var(--shadow); display: flex; align-items: center; gap: 0.8rem; animation: slideIn 0.3s ease; min-width: 300px; }
+.toast.success { border-left-color: #4CAF50; }
+.toast.error { border-left-color: var(--primary-red); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+.toast.hiding { animation: slideOut 0.3s ease forwards; }
+
+@media (max-width: 1024px) {
+    .about-container, .contact-container { grid-template-columns: 1fr; }
+    .footer-container { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+    .nav-links { display: none; }
+    .mobile-menu-btn { display: block; }
+    .hero-stats { gap: 1.5rem; }
+    .stat-number { font-size: 1.8rem; }
+    .about-features { grid-template-columns: 1fr; }
+    .footer-container { grid-template-columns: 1fr; text-align: center; }
+    .footer-social { justify-content: center; }
+    .admin-stats { grid-template-columns: 1fr; }
+    .floating-buttons { bottom: 20px; right: 20px; }
+    .floating-btn { width: 50px; height: 50px; font-size: 1.2rem; }
+}
+@media (max-width: 480px) {
+    .food-grid { grid-template-columns: 1fr; }
+    .hero-buttons { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">තෙම්පරාදුව</div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<div class="offer-banner" id="offerBanner">
+    Special Offer: Free Delivery on orders over Rs. 2000! | රු. 2000 ඉක්මවූ ඇණවුම්වලට නොමිලේ බෙදාහැරීම!
+</div>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="#" class="nav-logo"><i class="fas fa-utensils"></i> තෙම්පරාදුව</a>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#why-us">Why Us</a></li>
+            <li><a href="#reviews">Reviews</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="cart-icon" onclick="toggleCart()"><i class="fas fa-shopping-cart"></i><span class="cart-count" id="cartCount">0</span></button>
+            <button class="nav-btn" onclick="openAdmin()"><i class="fas fa-lock"></i> Admin</button>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+</nav>
+
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
+    <ul class="mobile-menu-links">
+        <li><a href="#home" onclick="toggleMobileMenu()">Home</a></li>
+        <li><a href="#menu" onclick="toggleMobileMenu()">Menu</a></li>
+        <li><a href="#about" onclick="toggleMobileMenu()">About</a></li>
+        <li><a href="#why-us" onclick="toggleMobileMenu()">Why Us</a></li>
+        <li><a href="#reviews" onclick="toggleMobileMenu()">Reviews</a></li>
+        <li><a href="#contact" onclick="toggleMobileMenu()">Contact</a></li>
+        <li><a href="#" onclick="toggleCart(); toggleMobileMenu();">Cart (<span id="mobileCartCount">0</span>)</a></li>
+        <li><a href="#" onclick="openAdmin(); toggleMobileMenu();">Admin Panel</a></li>
+    </ul>
+</div>
+
+<section class="hero" id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-content">
+        <div class="hero-badge">Authentic Sri Lankan Cuisine</div>
+        <h1 class="hero-title">තෙම්පරාදුව</h1>
+        <p class="hero-subtitle">Themparaduwa</p>
+        <p class="hero-slogan">
+            සැබෑ ශ්‍රී ලාංකික ගෘහස්ථ රසවත් ආහාර ඔබගේ දොරකඩටම<br>
+            <span style="opacity:0.8;font-size:0.95rem;">Authentic Sri Lankan homemade flavors delivered to your doorstep</span>
+        </p>
+        <div class="hero-buttons">
+            <a href="#menu" class="btn-primary"><i class="fas fa-utensils"></i> Order Now / ඇණවුම් කරන්න</a>
+            <a href="https://wa.me/94725018517" target="_blank" class="btn-secondary"><i class="fab fa-whatsapp"></i> WhatsApp Order</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item"><div class="stat-number">50+</div><div class="stat-label">Food Items</div></div>
+            <div class="stat-item"><div class="stat-number">500+</div><div class="stat-label">Happy Customers</div></div>
+            <div class="stat-item"><div class="stat-number">4.9</div><div class="stat-label">Rating</div></div>
+            <div class="stat-item"><div class="stat-number">30min</div><div class="stat-label">Delivery</div></div>
+        </div>
+    </div>
+</section>
+
+<section id="menu">
+    <div class="section-header animate-on-scroll">
+        <div class="section-label">Our Menu</div>
+        <h2 class="section-title">අපගේ මෙනුව</h2>
+        <p class="section-desc">Explore our delicious homemade Sri Lankan dishes crafted with love and tradition</p>
+    </div>
+    <div class="search-filter-bar animate-on-scroll">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search food... / ආහාර සොයන්න..." oninput="filterFoods()">
+        </div>
+        <div class="category-filters" id="categoryFilters">
+            <button class="filter-btn active" onclick="filterByCategory('all')">All</button>
+            <button class="filter-btn" onclick="filterByCategory('rice')">Rice</button>
+            <button class="filter-btn" onclick="filterByCategory('kottu')">Kottu</button>
+            <button class="filter-btn" onclick="filterByCategory('biriyani')">Biriyani</button>
+            <button class="filter-btn" onclick="filterByCategory('sides')">Sides</button>
+            <button class="filter-btn" onclick="filterByCategory('special')">Special</button>
+        </div>
+    </div>
+    <div class="food-grid" id="foodGrid"></div>
+</section>
+
+<section class="about-section" id="about">
+    <div class="about-container">
+        <div class="about-image animate-on-scroll">
+            <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80" alt="Sri Lankan Food">
+        </div>
+        <div class="about-content animate-on-scroll">
+            <div class="section-label">About Us</div>
+            <h2>අපි ගැන</h2>
+            <p>තෙම්පරාදුව is a passionate homemade food business founded by <strong style="color:var(--gold);">R. Rayan Rasheendra</strong>. We bring the authentic taste of Sri Lankan home cooking directly to your table.</p>
+            <p>Every dish we prepare carries the warmth of a Sri Lankan household, made with fresh ingredients, traditional recipes, and a whole lot of love. From spicy kottu to aromatic biriyani, we ensure every bite reminds you of home.</p>
+            <p style="color:var(--gold-light);">අපගේ ආහාර සෑදී ඇත්තේ පිරිසිදු, නැවුම් ද්‍රව්‍ය භාවිතයෙනි. සාම්ප්‍රදායික ශ්‍රී ලාංකික රසවත් ආහාර ඔබගේ නිවසටම ගෙන එන්නෙමු.</p>
+            <div class="about-features">
+                <div class="about-feature"><i class="fas fa-check-circle"></i><span>Fresh Ingredients</span></div>
+                <div class="about-feature"><i class="fas fa-check-circle"></i><span>Traditional Recipes</span></div>
+                <div class="about-feature"><i class="fas fa-check-circle"></i><span>Hygienic Kitchen</span></div>
+                <div class="about-feature"><i class="fas fa-check-circle"></i><span>Fast Delivery</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="why-us">
+    <div class="section-header animate-on-scroll">
+        <div class="section-label">Why Choose Us</div>
+        <h2 class="section-title">ඇයි අපිව තෝරන්නේ?</h2>
+        <p class="section-desc">We go above and beyond to deliver the best homemade food experience</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card animate-on-scroll">
+            <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+            <h3>Fresh Homemade Food</h3>
+            <p>නැවුම් ගෘහස්ථ ආහාර<br>Prepared fresh daily with quality ingredients</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3>Hygienic Cooking</h3>
+            <p>පිරිසිදු පිසීම<br>Strict hygiene standards in our kitchen</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+            <div class="feature-icon"><i class="fas fa-shipping-fast"></i></div>
+            <h3>Fast Delivery</h3>
+            <p>වේගවත් බෙදාහැරීම<br>Hot food delivered within 30 minutes</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+            <div class="feature-icon"><i class="fas fa-tags"></i></div>
+            <h3>Affordable Prices</h3>
+            <p>අඩු මිලට<br>Best quality at reasonable prices</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+            <div class="feature-icon"><i class="fas fa-heart"></i></div>
+            <h3>Traditional Taste</h3>
+            <p>සාම්ප්‍රදායික රසය<br>Authentic Sri Lankan flavors</p>
+        </div>
+    </div>
+</section>
+
+<section class="reviews-section" id="reviews">
+    <div class="section-header animate-on-scroll">
+        <div class="section-label">Testimonials</div>
+        <h2 class="section-title">පාරිභෝගික ඇගයීම්</h2>
+        <p class="section-desc">What our customers say about us</p>
+    </div>
+    <div class="reviews-grid">
+        <div class="review-card animate-on-scroll">
+            <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <p class="review-text">"The best homemade food I have ever tasted! The chicken kottu was absolutely amazing. Will definitely order again."</p>
+            <div class="reviewer">
+                <div class="reviewer-avatar">N</div>
+                <div class="reviewer-info"><h4>Nimal Perera</h4><span>Colombo</span></div>
+            </div>
+        </div>
+        <div class="review-card animate-on-scroll">
+            <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <p class="review-text">"Authentic Sri Lankan taste delivered to my doorstep. The biriyani was flavorful and the portions were generous. Highly recommended!"</p>
+            <div class="reviewer">
+                <div class="reviewer-avatar">S</div>
+                <div class="reviewer-info"><h4>Sanduni Fernando</h4><span>Gampaha</span></div>
+            </div>
+        </div>
+        <div class="review-card animate-on-scroll">
+            <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+            <p class="review-text">"Great service and delicious food. The wambatu moju and chili paste are my favorites. Quick delivery too!"</p>
+            <div class="reviewer">
+                <div class="reviewer-avatar">K</div>
+                <div class="reviewer-info"><h4>Kasun Silva</h4><span>Kalutara</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contact">
+    <div class="section-header animate-on-scroll">
+        <div class="section-label">Get In Touch</div>
+        <h2 class="section-title">අමතන්න</h2>
+        <p class="section-desc">We would love to hear from you</p>
+    </div>
+    <div class="contact-container">
+        <div class="contact-info animate-on-scroll">
+            <h3>Contact Information</h3>
+            <div class="contact-item">
+                <i class="fas fa-user"></i>
+                <div><h4>Owner</h4><p>R. Rayan Rasheendra</p></div>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <div><h4>Phone</h4><a href="tel:+94725018517">072 501 8517</a></div>
+            </div>
+            <div class="contact-item">
+                <i class="fab fa-whatsapp"></i>
+                <div><h4>WhatsApp</h4><a href="https://wa.me/94725018517" target="_blank">072 501 8517</a></div>
+            </div>
+            <div class="contact-item">
+                <i class="fab fa-facebook"></i>
+                <div><h4>Facebook</h4><a href="https://www.facebook.com/profile.php?id=61590598074743" target="_blank">Themparaduwa</a></div>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div><h4>Location</h4><p>Sri Lanka</p></div>
+            </div>
+        </div>
+        <div class="map-placeholder animate-on-scroll">
+            <i class="fas fa-map-marked-alt"></i>
+            <p>Google Map Location</p>
+            <p style="font-size:0.85rem;margin-top:0.5rem;">Sri Lanka</p>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-brand">
+            <h3><i class="fas fa-utensils"></i> තෙම්පරාදුව</h3>
+            <p>Authentic Sri Lankan homemade food delivered to your doorstep. Taste the tradition, feel the love.</p>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/profile.php?id=61590598074743" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://wa.me/94725018517" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+        <div class="footer-links">
+            <h4>Categories</h4>
+            <ul>
+                <li><a href="#menu">Rice Varieties</a></li>
+                <li><a href="#menu">Kottu</a></li>
+                <li><a href="#menu">Biriyani</a></li>
+                <li><a href="#menu">Side Dishes</a></li>
+            </ul>
+        </div>
+        <div class="footer-links">
+            <h4>Contact</h4>
+            <ul>
+                <li><a href="tel:+94725018517">072 501 8517</a></li>
+                <li><a href="https://wa.me/94725018517">WhatsApp</a></li>
+                <li><a href="#">Sri Lanka</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p> 2025 තෙම්පරාදුව (Themparaduwa). All Rights Reserved. | Designed with <i class="fas fa-heart" style="color:var(--primary-red);"></i> for R. Rayan Rasheendra</p>
+    </div>
+</footer>
+
+<!-- Cart Sidebar -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+        <button class="cart-close" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <div class="cart-empty">
+            <i class="fas fa-shopping-basket"></i>
+            <p>Your cart is empty</p>
+            <p style="font-size:0.85rem;margin-top:0.5rem;">Add some delicious food!</p>
+        </div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+        <div class="cart-total"><span>Total:</span><span id="cartTotal">Rs. 0</span></div>
+        <button class="checkout-btn" onclick="openCheckout()"><i class="fas fa-credit-card"></i> Checkout</button>
+        <button class="whatsapp-checkout" onclick="whatsappOrder()"><i class="fab fa-whatsapp"></i> Order via WhatsApp</button>
+    </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal-overlay" id="checkoutModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-credit-card"></i> Checkout</h3>
+            <button class="cart-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="order-summary" id="orderSummary"></div>
+            <div class="form-group">
+                <label>Full Name / සම්පූර්ණ නම</label>
+                <input type="text" id="checkoutName" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>Phone Number / දුරකථන අංකය</label>
+                <input type="tel" id="checkoutPhone" placeholder="07X XXX XXXX">
+            </div>
+            <div class="form-group">
+                <label>Delivery Address / බෙදාහැරීමේ ලිපිනය</label>
+                <textarea id="checkoutAddress" placeholder="Enter your delivery address"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Order Notes / ඇණවුම් සටහන් (Optional)</label>
+                <textarea id="checkoutNotes" placeholder="Any special instructions..."></textarea>
+            </div>
+            <button class="submit-order-btn" onclick="submitOrder()"><i class="fas fa-paper-plane"></i> Place Order</button>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-overlay" id="adminOverlay">
+    <div class="admin-panel">
+        <div class="admin-header">
+            <h2><i class="fas fa-cog"></i> Admin Panel</h2>
+            <button class="admin-close" onclick="closeAdmin()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="admin-body" id="adminBody">
+            <div id="adminLogin">
+                <div class="login-form">
+                    <h3><i class="fas fa-lock"></i> Admin Login</h3>
+                    <p>Enter password to access admin panel</p>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="adminPassword" placeholder="Enter password">
+                    </div>
+                    <button class="login-btn" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+                </div>
+            </div>
+            <div id="adminDashboard" style="display:none;">
+                <div class="admin-stats">
+                    <div class="admin-stat-card"><h3 id="statTotalItems">0</h3><p>Total Items</p></div>
+                    <div class="admin-stat-card"><h3 id="statAvailable">0</h3><p>Available</p></div>
+                    <div class="admin-stat-card"><h3 id="statOutOfStock">0</h3><p>Out of Stock</p></div>
+                </div>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('foods')">Foods</button>
+                    <button class="admin-tab" onclick="switchAdminTab('orders')">Orders</button>
+                    <button class="admin-tab" onclick="switchAdminTab('add')">Add New</button>
+                </div>
+                <div class="admin-section active" id="tab-foods">
+                    <div class="admin-food-grid" id="adminFoodGrid"></div>
+                </div>
+                <div class="admin-section" id="tab-orders">
+                    <p style="color:var(--gray);text-align:center;padding:2rem;">Order management coming soon...</p>
+                </div>
+                <div class="admin-section" id="tab-add">
+                    <h3 style="color:var(--gold);margin-bottom:1.5rem;">Add New Food Item</h3>
+                    <div class="form-group">
+                        <label>Food Name</label>
+                        <input type="text" id="newFoodName" placeholder="Enter food name">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="newFoodCategory">
+                            <option value="rice">Rice Varieties</option>
+                            <option value="kottu">Kottu Varieties</option>
+                            <option value="biriyani">Biriyani Varieties</option>
+                            <option value="sides">Side Dishes</option>
+                            <option value="special">Special Foods</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (Rs.)</label>
+                        <input type="number" id="newFoodPrice" placeholder="Enter price">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="newFoodDesc" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" id="newFoodImage" placeholder="Enter image URL (or leave for default)">
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="newFoodFeatured"> Featured Item</label>
+                    </div>
+                    <button class="add-food-btn" onclick="addNewFood()"><i class="fas fa-plus"></i> Add Food Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Buttons -->
+<div class="floating-buttons">
+    <a href="https://wa.me/94725018517" target="_blank" class="floating-btn float-whatsapp" title="Order via WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <button class="floating-btn float-admin" onclick="openAdmin()" title="Admin Panel">
+        <i class="fas fa-cog"></i>
+    </button>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Cart Sidebar -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+        <button class="cart-close" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <div class="cart-empty">
+            <i class="fas fa-shopping-basket"></i>
+            <p>Your cart is empty</p>
+            <p style="font-size:0.85rem;margin-top:0.5rem;">Add some delicious food!</p>
+        </div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+        <div class="cart-total"><span>Total:</span><span id="cartTotal">Rs. 0</span></div>
+        <button class="checkout-btn" onclick="openCheckout()"><i class="fas fa-credit-card"></i> Checkout</button>
+        <button class="whatsapp-checkout" onclick="whatsappOrder()"><i class="fab fa-whatsapp"></i> Order via WhatsApp</button>
+    </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal-overlay" id="checkoutModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-credit-card"></i> Checkout</h3>
+            <button class="cart-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="order-summary" id="orderSummary"></div>
+            <div class="form-group">
+                <label>Full Name / සම්පූර්ණ නම</label>
+                <input type="text" id="checkoutName" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>Phone Number / දුරකථන අංකය</label>
+                <input type="tel" id="checkoutPhone" placeholder="07X XXX XXXX">
+            </div>
+            <div class="form-group">
+                <label>Delivery Address / බෙදාහැරීමේ ලිපිනය</label>
+                <textarea id="checkoutAddress" placeholder="Enter your delivery address"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Order Notes / ඇණවුම් සටහන් (Optional)</label>
+                <textarea id="checkoutNotes" placeholder="Any special instructions..."></textarea>
+            </div>
+            <button class="submit-order-btn" onclick="submitOrder()"><i class="fas fa-paper-plane"></i> Place Order</button>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-overlay" id="adminOverlay">
+    <div class="admin-panel">
+        <div class="admin-header">
+            <h2><i class="fas fa-cog"></i> Admin Panel</h2>
+            <button class="admin-close" onclick="closeAdmin()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="admin-body" id="adminBody">
+            <div id="adminLogin">
+                <div class="login-form">
+                    <h3><i class="fas fa-lock"></i> Admin Login</h3>
+                    <p>Enter password to access admin panel</p>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="adminPassword" placeholder="Enter password">
+                    </div>
+                    <button class="login-btn" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+                </div>
+            </div>
+            <div id="adminDashboard" style="display:none;">
+                <div class="admin-stats">
+                    <div class="admin-stat-card"><h3 id="statTotalItems">0</h3><p>Total Items</p></div>
+                    <div class="admin-stat-card"><h3 id="statAvailable">0</h3><p>Available</p></div>
+                    <div class="admin-stat-card"><h3 id="statOutOfStock">0</h3><p>Out of Stock</p></div>
+                </div>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('foods')">Foods</button>
+                    <button class="admin-tab" onclick="switchAdminTab('orders')">Orders</button>
+                    <button class="admin-tab" onclick="switchAdminTab('add')">Add New</button>
+                </div>
+                <div class="admin-section active" id="tab-foods">
+                    <div class="admin-food-grid" id="adminFoodGrid"></div>
+                </div>
+                <div class="admin-section" id="tab-orders">
+                    <p style="color:var(--gray);text-align:center;padding:2rem;">Order management coming soon...</p>
+                </div>
+                <div class="admin-section" id="tab-add">
+                    <h3 style="color:var(--gold);margin-bottom:1.5rem;">Add New Food Item</h3>
+                    <div class="form-group">
+                        <label>Food Name</label>
+                        <input type="text" id="newFoodName" placeholder="Enter food name">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="newFoodCategory">
+                            <option value="rice">Rice Varieties</option>
+                            <option value="kottu">Kottu Varieties</option>
+                            <option value="biriyani">Biriyani Varieties</option>
+                            <option value="sides">Side Dishes</option>
+                            <option value="special">Special Foods</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (Rs.)</label>
+                        <input type="number" id="newFoodPrice" placeholder="Enter price">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="newFoodDesc" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" id="newFoodImage" placeholder="Enter image URL (or leave for default)">
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="newFoodFeatured"> Featured Item</label>
+                    </div>
+                    <button class="add-food-btn" onclick="addNewFood()"><i class="fas fa-plus"></i> Add Food Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Buttons -->
+<div class="floating-buttons">
+    <a href="https://wa.me/94725018517" target="_blank" class="floating-btn float-whatsapp" title="Order via WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <button class="floating-btn float-admin" onclick="openAdmin()" title="Admin Panel">
+        <i class="fas fa-cog"></i>
+    </button>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==================== DATA ====================
+const defaultFoods = [
+    { id: 1, name: "Chicken Fried Rice", nameSi: "චිකන් ෆ්‍රයිඩ් රයිස්", category: "rice", price: 450, image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=500&q=80", description: "Aromatic fried rice with tender chicken pieces and vegetables", available: true, featured: true },
+    { id: 2, name: "Egg Fried Rice", nameSi: "එග් ෆ්‍රයිඩ් රයිස්", category: "rice", price: 350, image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500&q=80", description: "Classic fried rice with scrambled eggs and fresh vegetables", available: true, featured: false },
+    { id: 3, name: "Mixed Fried Rice", nameSi: "මික්ස්ඩ් ෆ්‍රයිඩ් රයිස්", category: "rice", price: 550, image: "https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=500&q=80", description: "Special fried rice with chicken, egg, and seafood mix", available: true, featured: true },
+    { id: 4, name: "Chicken Kottu", nameSi: "චිකන් කොත්තු", category: "kottu", price: 500, image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=500&q=80", description: "Sri Lankan style chopped roti with chicken and vegetables", available: true, featured: true },
+    { id: 5, name: "Cheese Kottu", nameSi: "චීස් කොත්තු", category: "kottu", price: 600, image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", description: "Creamy kottu loaded with melted cheese", available: true, featured: true },
+    { id: 6, name: "Egg Kottu", nameSi: "එග් කොත්තු", category: "kottu", price: 400, image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&q=80", description: "Classic kottu with scrambled eggs and spices", available: true, featured: false },
+    { id: 7, name: "Seafood Kottu", nameSi: "සීෆුඩ් කොත්තු", category: "kottu", price: 650, image: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=500&q=80", description: "Delicious kottu with prawns and cuttlefish", available: true, featured: false },
+    { id: 8, name: "Chicken Biriyani", nameSi: "චිකන් බිරියානි", category: "biriyani", price: 600, image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&q=80", description: "Fragrant basmati rice with spiced chicken and raita", available: true, featured: true },
+    { id: 9, name: "Egg Biriyani", nameSi: "එග් බිරියානි", category: "biriyani", price: 450, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80", description: "Aromatic biriyani with boiled eggs and special spices", available: true, featured: false },
+    { id: 10, name: "Wambatu Moju", nameSi: "වම්බටු මොජු", category: "sides", price: 200, image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500&q=80", description: "Sweet and spicy caramelized eggplant pickle", available: true, featured: true },
+    { id: 11, name: "Chili Paste", nameSi: "සම්බෝල්", category: "sides", price: 150, image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80", description: "Spicy Sri Lankan chili paste (Pol Sambol)", available: true, featured: false },
+    { id: 12, name: "Lunu Dehi", nameSi: "ලුණු දෙහි", category: "sides", price: 180, image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80", description: "Traditional lime pickle with chili and spices", available: true, featured: false },
+    { id: 13, name: "Chicken Cutlets", nameSi: "චිකන් කට්ලට්", category: "sides", price: 80, image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500&q=80", description: "Crispy fried chicken cutlets (per piece)", available: true, featured: false },
+    { id: 14, name: "Vegetable Rolls", nameSi: "එළවළු රෝල්ස්", category: "sides", price: 60, image: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=500&q=80", description: "Crispy vegetable spring rolls (per piece)", available: true, featured: false },
+    { id: 15, name: "Fish Cutlets", nameSi: "මාළු කට්ලට්", category: "sides", price: 70, image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", description: "Spicy fish cutlets (per piece)", available: true, featured: false },
+    { id: 16, name: "Special Rice & Curry", nameSi: "විශේෂ රයිස් ඇන්ඩ් කරි", category: "special", price: 400, image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80", description: "Traditional Sri Lankan rice with 3 curries and papadum", available: true, featured: true },
+    { id: 17, name: "Chicken Sandwich", nameSi: "චිකන් සැන්ඩ්විච්", category: "special", price: 350, image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500&q=80", description: "Grilled chicken sandwich with fresh vegetables", available: true, featured: false },
+    { id: 18, name: "Vegetable Kottu", nameSi: "එළවළු කොත්තු", category: "kottu", price: 350, image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80", description: "Healthy vegetable kottu with fresh greens", available: true, featured: false },
+];
+
+// ==================== STATE ====================
+let foods = JSON.parse(localStorage.getItem('themparaduwa_foods')) || [...defaultFoods];
+let cart = JSON.parse(localStorage.getItem('themparaduwa_cart')) || [];
+let currentCategory = 'all';
+let isAdminLoggedIn = false;
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => { document.getElementById('loadingScreen').classList.add('hidden'); }, 2200);
+    createParticles();
+    renderFoods();
+    updateCartUI();
+    initScrollAnimations();
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) { navbar.classList.add('scrolled'); } else { navbar.classList.remove('scrolled'); }
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeCheckout(); closeAdmin();
+            document.getElementById('cartOverlay').classList.remove('active');
+            document.getElementById('cartSidebar').classList.remove('active');
+        }
+    });
+});
+
+function createParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+        container.appendChild(particle);
+    }
+}
+
+function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+}
+
+// ==================== FOOD RENDERING ====================
+function renderFoods() {
+    const grid = document.getElementById('foodGrid');
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = foods.filter(food => {
+        const matchesSearch = food.name.toLowerCase().includes(searchTerm) || food.nameSi.includes(searchTerm) || food.description.toLowerCase().includes(searchTerm);
+        const matchesCategory = currentCategory === 'all' || food.category === currentCategory;
+        return matchesSearch && matchesCategory;
+    });
+    if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--gray);"><i class="fas fa-search" style="font-size:3rem;margin-bottom:1rem;display:block;"></i>No food items found matching your search.</div>';
+        return;
+    }
+    grid.innerHTML = filtered.map(food => `
+        <div class="food-card animate-on-scroll">
+            <div class="food-card-image">
+                <img src="${food.image}" alt="${food.name}" loading="lazy">
+                ${food.featured ? '<span class="food-badge featured">Featured</span>' : ''}
+                ${!food.available ? '<span class="food-badge out-of-stock">Out of Stock</span>' : ''}
+            </div>
+            <div class="food-card-content">
+                <div class="food-card-category">${getCategoryName(food.category)}</div>
+                <h3 class="food-card-title">${food.name}</h3>
+                <p class="food-card-desc">${food.description}</p>
+                <div class="food-card-footer">
+                    <div class="food-price">Rs. ${food.price}<span> / pcs</span></div>
+                    <button class="add-to-cart-btn" onclick="addToCart(${food.id})" ${!food.available ? 'disabled' : ''} title="${food.available ? 'Add to cart' : 'Out of stock'}">
+                        <i class="fas ${food.available ? 'fa-plus' : 'fa-times'}"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    setTimeout(() => {
+        const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); }); }, { threshold: 0.1 });
+        document.querySelectorAll('.food-card.animate-on-scroll').forEach(el => observer.observe(el));
+    }, 100);
+}
+
+function getCategoryName(cat) {
+    const names = { rice: 'Rice Varieties', kottu: 'Kottu Varieties', biriyani: 'Biriyani Varieties', sides: 'Side Dishes', special: 'Special Foods' };
+    return names[cat] || cat;
+}
+
+function filterByCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderFoods();
+}
+
+function filterFoods() { renderFoods(); }
+
+// ==================== CART FUNCTIONS ====================
+function addToCart(foodId) {
+    const food = foods.find(f => f.id === foodId);
+    if (!food || !food.available) return;
+    const existingItem = cart.find(item => item.id === foodId);
+    if (existingItem) { existingItem.qty++; } else { cart.push({ id: foodId, qty: 1 }); }
+    saveCart(); updateCartUI(); showToast(food.name + ' added to cart!', 'success');
+}
+
+function removeFromCart(foodId) {
+    cart = cart.filter(item => item.id !== foodId);
+    saveCart(); updateCartUI();
+}
+
+function updateQty(foodId, change) {
+    const item = cart.find(item => item.id === foodId);
+    if (item) {
+        item.qty += change;
+        if (item.qty <= 0) { removeFromCart(foodId); return; }
+        saveCart(); updateCartUI();
+    }
+}
+
+function saveCart() { localStorage.setItem('themparaduwa_cart', JSON.stringify(cart)); }
+
+function updateCartUI() {
+    const cartItems = document.getElementById('cartItems');
+    const cartFooter = document.getElementById('cartFooter');
+    const cartCount = document.getElementById('cartCount');
+    const mobileCartCount = document.getElementById('mobileCartCount');
+    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    cartCount.textContent = totalItems;
+    mobileCartCount.textContent = totalItems;
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<div class="cart-empty"><i class="fas fa-shopping-basket"></i><p>Your cart is empty</p><p style="font-size:0.85rem;margin-top:0.5rem;">Add some delicious food!</p></div>';
+        cartFooter.style.display = 'none'; return;
+    }
+    let total = 0;
+    cartItems.innerHTML = cart.map(item => {
+        const food = foods.find(f => f.id === item.id);
+        if (!food) return '';
+        const subtotal = food.price * item.qty; total += subtotal;
+        return `<div class="cart-item"><img src="${food.image}" alt="${food.name}"><div class="cart-item-info"><h4>${food.name}</h4><p>Rs. ${subtotal}</p></div><div class="cart-item-actions"><button class="qty-btn" onclick="updateQty(${item.id}, -1)"><i class="fas fa-minus"></i></button><span class="cart-item-qty">${item.qty}</span><button class="qty-btn" onclick="updateQty(${item.id}, 1)"><i class="fas fa-plus"></i></button><button class="cart-item-remove" onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button></div></div>`;
+    }).join('');
+    document.getElementById('cartTotal').textContent = 'Rs. ' + total;
+    cartFooter.style.display = 'block';
+}
+
+function toggleCart() {
+    document.getElementById('cartOverlay').classList.toggle('active');
+    document.getElementById('cartSidebar').classList.toggle('active');
+}
+
+function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('active');
+    document.getElementById('mobileMenuOverlay').classList.toggle('active');
+}
+
+// ==================== CHECKOUT ====================
+function openCheckout() {
+    if (cart.length === 0) { showToast('Your cart is empty!', 'error'); return; }
+    toggleCart();
+    let total = 0;
+    const summaryHTML = cart.map(item => {
+        const food = foods.find(f => f.id === item.id);
+        const subtotal = food.price * item.qty; total += subtotal;
+        return '<div class="summary-item"><span>' + food.name + ' x' + item.qty + '</span><span>Rs. ' + subtotal + '</span></div>';
+    }).join('') + '<div class="summary-item summary-total"><span>Total</span><span>Rs. ' + total + '</span></div>';
+    document.getElementById('orderSummary').innerHTML = '<h4>Order Summary</h4>' + summaryHTML;
+    document.getElementById('checkoutModal').classList.add('active');
+}
+
+function closeCheckout() { document.getElementById('checkoutModal').classList.remove('active'); }
+
+function submitOrder() {
+    const name = document.getElementById('checkoutName').value.trim();
+    const phone = document.getElementById('checkoutPhone').value.trim();
+    const address = document.getElementById('checkoutAddress').value.trim();
+    if (!name || !phone || !address) { showToast('Please fill in all required fields', 'error'); return; }
+    let message = '*New Order from Themparaduwa*%0A%0A*Customer:* ' + name + '%0A*Phone:* ' + phone + '%0A*Address:* ' + address + '%0A%0A*Order Items:*%0A';
+    let total = 0;
+    cart.forEach(item => {
+        const food = foods.find(f => f.id === item.id);
+        const subtotal = food.price * item.qty; total += subtotal;
+        message += '- ' + food.name + ' x' + item.qty + ' = Rs. ' + subtotal + '%0A';
+    });
+    message += '%0A*Total: Rs. ' + total + '*%0A';
+    const notes = document.getElementById('checkoutNotes').value.trim();
+    if (notes) message += '%0A*Notes:* ' + notes;
+    window.open('https://wa.me/94725018517?text=' + message, '_blank');
+    cart = []; saveCart(); updateCartUI(); closeCheckout(); showToast('Order sent via WhatsApp!', 'success');
+}
+
+function whatsappOrder() {
+    if (cart.length === 0) { showToast('Your cart is empty!', 'error'); return; }
+    let message = '*Order from Themparaduwa*%0A%0A';
+    let total = 0;
+    cart.forEach(item => {
+        const food = foods.find(f => f.id === item.id);
+        const subtotal = food.price * item.qty; total += subtotal;
+        message += '- ' + food.name + ' x' + item.qty + ' = Rs. ' + subtotal + '%0A';
+    });
+    message += '%0A*Total: Rs. ' + total + '*%0A%0APlease send your name and delivery address.';
+    window.open('https://wa.me/94725018517?text=' + message, '_blank');
+    showToast('Redirecting to WhatsApp...', 'success');
+}
+
+// ==================== ADMIN PANEL ====================
+function openAdmin() { document.getElementById('adminOverlay').classList.add('active'); if (isAdminLoggedIn) showAdminDashboard(); }
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('active'); }
+
+function adminLogin() {
+    const password = document.getElementById('adminPassword').value;
+    if (password === '9517') { isAdminLoggedIn = true; showAdminDashboard(); showToast('Welcome to Admin Panel!', 'success'); }
+    else { showToast('Incorrect password!', 'error'); }
+}
+
+function showAdminDashboard() {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
+    updateAdminStats(); renderAdminFoods();
+}
+
+function updateAdminStats() {
+    document.getElementById('statTotalItems').textContent = foods.length;
+    document.getElementById('statAvailable').textContent = foods.filter(f => f.available).length;
+    document.getElementById('statOutOfStock').textContent = foods.filter(f => !f.available).length;
+}
+
+function renderAdminFoods() {
+    const grid = document.getElementById('adminFoodGrid');
+    grid.innerHTML = foods.map(food => `
+        <div class="admin-food-item">
+            <img src="${food.image}" alt="${food.name}">
+            <div class="admin-food-info"><h4>${food.name}</h4><p>Rs. ${food.price}</p></div>
+            <div class="admin-food-actions">
+                <button class="admin-btn-sm admin-btn-edit" onclick="editFood(${food.id})"><i class="fas fa-edit"></i></button>
+                <button class="admin-btn-sm admin-btn-delete" onclick="deleteFood(${food.id})"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function switchAdminTab(tab) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function addNewFood() {
+    const name = document.getElementById('newFoodName').value.trim();
+    const category = document.getElementById('newFoodCategory').value;
+    const price = parseFloat(document.getElementById('newFoodPrice').value);
+    const description = document.getElementById('newFoodDesc').value.trim();
+    const image = document.getElementById('newFoodImage').value.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
+    const featured = document.getElementById('newFoodFeatured').checked;
+    if (!name || !price) { showToast('Please fill in name and price', 'error'); return; }
+    const newId = Math.max(...foods.map(f => f.id), 0) + 1;
+    foods.push({ id: newId, name, nameSi: name, category, price, image, description: description || 'Delicious homemade food', available: true, featured });
+    localStorage.setItem('themparaduwa_foods', JSON.stringify(foods));
+    renderFoods(); updateAdminStats(); renderAdminFoods();
+    document.getElementById('newFoodName').value = '';
+    document.getElementById('newFoodPrice').value = '';
+    document.getElementById('newFoodDesc').value = '';
+    document.getElementById('newFoodImage').value = '';
+    document.getElementById('newFoodFeatured').checked = false;
+    showToast('Food item added successfully!', 'success');
+}
+
+function deleteFood(id) {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    foods = foods.filter(f => f.id !== id);
+    localStorage.setItem('themparaduwa_foods', JSON.stringify(foods));
+    renderFoods(); updateAdminStats(); renderAdminFoods();
+    showToast('Food item deleted!', 'success');
+}
+
+function editFood(id) {
+    const food = foods.find(f => f.id === id);
+    if (!food) return;
+    const newName = prompt('Food Name:', food.name);
+    if (newName === null) return;
+    const newPrice = prompt('Price (Rs.):', food.price);
+    if (newPrice === null) return;
+    const newAvailable = confirm('Is this item available?');
+    food.name = newName || food.name;
+    food.price = parseFloat(newPrice) || food.price;
+    food.available = newAvailable;
+    localStorage.setItem('themparaduwa_foods', JSON.stringify(foods));
+    renderFoods(); updateAdminStats(); renderAdminFoods();
+    showToast('Food item updated!', 'success');
+}
+
+// ==================== TOAST ====================
+function showToast(message, type) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    toast.innerHTML = '<i class="fas ' + icon + '"></i><span>' + message + '</span>';
+    container.appendChild(toast);
+    setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, 3000);
+}
+</script>
+</body>
+</html>
